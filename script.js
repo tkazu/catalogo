@@ -8,6 +8,7 @@ let products = [];
 let today = null;
 
 
+// Elementos da página
 const grid = document.getElementById("grid");
 const search = document.getElementById("search");
 const category = document.getElementById("category");
@@ -17,11 +18,11 @@ const status = document.getElementById("status");
 
 
 /*
- * Formata valores em reais
+ * Formata o preço em reais
  */
 function money(value) {
 
-  return value.toLocaleString("pt-BR", {
+  return Number(value).toLocaleString("pt-BR", {
     style: "currency",
     currency: "BRL"
   });
@@ -31,8 +32,9 @@ function money(value) {
 
 
 /*
- * Converte YYYY-MM-DD
- * sem problemas de fuso horário.
+ * Converte uma data no formato YYYY-MM-DD
+ *
+ * Evita problemas de fuso horário.
  */
 function parseDate(dateString) {
 
@@ -49,7 +51,7 @@ function parseDate(dateString) {
 
 
 /*
- * Formata data para DD/MM/YYYY
+ * Formata a data para DD/MM/YYYY
  */
 function formatDate(dateString) {
 
@@ -61,7 +63,38 @@ function formatDate(dateString) {
 
 
 /*
- * Verifica validade do produto
+ * Obtém a data atual
+ *
+ * Usa o fuso horário de São Paulo.
+ */
+function loadServerDate() {
+
+  const now = new Date();
+
+  const dateString =
+    now.toLocaleDateString(
+      "en-CA",
+      {
+        timeZone: "America/Sao_Paulo"
+      }
+    );
+
+  today = parseDate(dateString);
+
+}
+
+
+
+/*
+ * Verifica a validade do produto
+ *
+ * Retorna:
+ *
+ * vencido = true
+ *   Produto não será exibido.
+ *
+ * alerta = true
+ *   Faltam 30 dias ou menos.
  */
 function statusValidade(validade) {
 
@@ -86,10 +119,11 @@ function statusValidade(validade) {
     today.getTime();
 
 
-  const dias = Math.ceil(
-    diferenca /
-    (1000 * 60 * 60 * 24)
-  );
+  const dias =
+    Math.ceil(
+      diferenca /
+      (1000 * 60 * 60 * 24)
+    );
 
 
   // Produto vencido
@@ -98,28 +132,29 @@ function statusValidade(validade) {
     return {
       vencido: true,
       alerta: false,
-      dias
+      dias: dias
     };
 
   }
 
 
-  // Até 30 dias para vencer
+  // Vence em até 30 dias
   if (dias <= 30) {
 
     return {
       vencido: false,
       alerta: true,
-      dias
+      dias: dias
     };
 
   }
 
 
+  // Produto válido
   return {
     vencido: false,
     alerta: false,
-    dias
+    dias: dias
   };
 
 }
@@ -127,7 +162,7 @@ function statusValidade(validade) {
 
 
 /*
- * Link para WhatsApp
+ * Cria o link do WhatsApp
  */
 function whatsappUrl(product) {
 
@@ -146,7 +181,7 @@ function whatsappUrl(product) {
 
 
 /*
- * Mostra os produtos
+ * Mostra os produtos na tela
  */
 function render() {
 
@@ -163,25 +198,38 @@ function render() {
   const list =
     products.filter(product => {
 
+      /*
+       * Verifica validade
+       */
       const validade =
         statusValidade(product.validade);
 
 
-      // Não mostra produto vencido
+      /*
+       * Produto vencido não aparece
+       */
       if (validade.vencido) {
+
         return false;
+
       }
 
 
+      /*
+       * Pesquisa
+       */
       const matchesSearch =
         !query ||
         `${product.name} ` +
-        `${product.description} ` +
+        `${product.description || ""} ` +
         `${product.id}`
           .toLowerCase()
           .includes(query);
 
 
+      /*
+       * Categoria
+       */
       const matchesCategory =
         !selectedCategory ||
         product.category === selectedCategory;
@@ -196,6 +244,9 @@ function render() {
 
 
 
+  /*
+   * Monta os cartões
+   */
   grid.innerHTML =
     list.map(product => {
 
@@ -206,22 +257,40 @@ function render() {
       let validadeHtml = "";
 
 
+      /*
+       * Produto possui validade
+       */
       if (product.validade) {
 
+        /*
+         * Próximo do vencimento
+         */
         if (validade.alerta) {
+
+          const textoDias =
+            validade.dias === 0
+              ? "vence hoje"
+              : `vence em ${validade.dias} dias`;
+
 
           validadeHtml = `
             <div class="validade validade-alerta">
-              ⚠️ Vence em ${validade.dias} dias
+              ⚠️ ${textoDias}
               (${formatDate(product.validade)})
             </div>
           `;
 
-        } else {
+        }
+
+        /*
+         * Produto válido normalmente
+         */
+        else {
 
           validadeHtml = `
             <div class="validade validade-normal">
-              Validade: ${formatDate(product.validade)}
+              Validade:
+              ${formatDate(product.validade)}
             </div>
           `;
 
@@ -251,7 +320,7 @@ function render() {
             </div>
 
             <div class="desc">
-              ${product.description}
+              ${product.description || ""}
             </div>
 
             <div class="price">
@@ -278,6 +347,9 @@ function render() {
     .join("");
 
 
+  /*
+   * Mostra mensagem quando não há produtos
+   */
   empty.hidden =
     list.length !== 0;
 
@@ -286,28 +358,41 @@ function render() {
 
 
 /*
- * Carrega categorias
+ * Carrega as categorias
  */
 function loadCategories() {
 
+  /*
+   * Limpa as categorias existentes
+   */
   category.innerHTML =
     '<option value="">Todas as categorias</option>';
 
 
-  [
-    ...new Set(
-      products.map(
-        product => product.category
+  /*
+   * Cria lista de categorias únicas
+   */
+  const categories =
+    [
+      ...new Set(
+        products
+          .map(product => product.category)
+          .filter(Boolean)
       )
-    )
-  ]
-  .sort()
-  .forEach(c => {
+    ]
+    .sort();
+
+
+  /*
+   * Adiciona ao SELECT
+   */
+  categories.forEach(c => {
 
     const option =
       document.createElement("option");
 
     option.value = c;
+
     option.textContent = c;
 
     category.appendChild(option);
@@ -327,50 +412,35 @@ async function loadProducts() {
     await fetch("produtos.json");
 
 
+  /*
+   * Verifica se o arquivo existe
+   */
   if (!response.ok) {
 
     throw new Error(
-      "Não foi possível carregar produtos.json"
+      `Erro ao carregar produtos.json: ${response.status}`
     );
 
   }
 
 
+  /*
+   * Converte JSON
+   */
   products =
     await response.json();
 
-}
 
+  /*
+   * Verifica se é realmente uma lista
+   */
+  if (!Array.isArray(products)) {
 
+    throw new Error(
+      "produtos.json precisa conter uma lista de produtos."
+    );
 
-function loadServerDate() {
-
-  const now = new Date();
-
-  const dateString = now.toLocaleDateString(
-    "en-CA",
-    {
-      timeZone: "America/Sao_Paulo"
-    }
-  );
-
-  today = parseDate(dateString);
-}
-
-
-  const data =
-    await response.json();
-
-
-  const serverDate =
-    new Date(data.datetime);
-
-
-  today = new Date(
-    serverDate.getFullYear(),
-    serverDate.getMonth(),
-    serverDate.getDate()
-  );
+  }
 
 }
 
@@ -383,13 +453,22 @@ async function init() {
 
   try {
 
+    /*
+     * Obtém a data
+     */
     status.textContent =
       "Obtendo data atual...";
 
 
+    /*
+     * NÃO usamos await aqui.
+     */
     loadServerDate();
 
 
+    /*
+     * Carrega os produtos
+     */
     status.textContent =
       "Carregando produtos...";
 
@@ -397,30 +476,50 @@ async function init() {
     await loadProducts();
 
 
+    /*
+     * Carrega categorias
+     */
     loadCategories();
 
 
+    /*
+     * Mostra produtos
+     */
     render();
 
 
+    /*
+     * Mensagem de sucesso
+     */
     status.textContent =
       `${products.length} produtos carregados`;
 
 
   } catch (error) {
 
-    console.error(error);
+    /*
+     * Mostra erro no console
+     */
+    console.error(
+      "Erro ao inicializar catálogo:",
+      error
+    );
 
 
+    /*
+     * Mostra erro na página
+     */
     status.textContent =
       "Erro ao carregar catálogo.";
 
 
-    empty.hidden = false;
+    empty.hidden =
+      false;
 
 
     empty.textContent =
-      "Não foi possível carregar os produtos.";
+      "Não foi possível carregar os produtos. " +
+      "Verifique o arquivo produtos.json.";
 
   }
 
@@ -429,7 +528,7 @@ async function init() {
 
 
 /*
- * Eventos
+ * Pesquisa
  */
 search.addEventListener(
   "input",
@@ -437,6 +536,10 @@ search.addEventListener(
 );
 
 
+
+/*
+ * Filtro de categoria
+ */
 category.addEventListener(
   "change",
   render
@@ -445,7 +548,7 @@ category.addEventListener(
 
 
 /*
- * Inicia
+ * Inicia o catálogo
  */
 init();
 
