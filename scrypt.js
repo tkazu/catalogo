@@ -343,25 +343,19 @@ async function loadProducts() {
 
 
 
-/*
- * Consulta a data atual
- * no servidor.
- */
-async function loadServerDate() {
+function loadServerDate() {
 
-  const response =
-    await fetch(
-      "https://worldtimeapi.org/api/timezone/America/Sao_Paulo"
-    );
+  const now = new Date();
 
+  const dateString = now.toLocaleDateString(
+    "en-CA",
+    {
+      timeZone: "America/Sao_Paulo"
+    }
+  );
 
-  if (!response.ok) {
-
-    throw new Error(
-      "Não foi possível obter a data do servidor"
-    );
-
-  }
+  today = parseDate(dateString);
+}
 
 
   const data =
@@ -393,7 +387,7 @@ async function init() {
       "Obtendo data atual...";
 
 
-    await loadServerDate();
+    loadServerDate();
 
 
     status.textContent =
