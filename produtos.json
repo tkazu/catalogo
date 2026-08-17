@@ -24,5 +24,14 @@
     "price": 59.90,
     "image": "imagens/tela.jpg",
     "description": "Cesto dianteiro para bicicleta."
+  },
+   {
+    "id": "BIKE2026",
+    "name": "Bicicleta Aro 20",
+    "category": "Bicicletas",
+    "price": 799.00,
+    "image": "imagens/tela.jpg",
+    "description": "Bicicleta aro 20 para uso urbano e lazer.",
+    "validade": "2026-08-16"
   }
 ]
