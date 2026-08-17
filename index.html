@@ -37,22 +37,19 @@ footer{text-align:center;padding:30px;color:#777;font-size:13px}
 <footer>Atendimento pelo WhatsApp</footer>
 
 <script>
-const WHATSAPP = "5543999999999"; // TROQUE pelo seu número: 55 + DDD + número
-const products = [{"id": "BIKE20", "name": "Bicicleta Aro 20", "category": "Bicicletas", "price": 799.0, "image": "imagens/tela.jpg", "description": "Bicicleta aro 20 para uso urbano e lazer."}, {"id": "CAP01", "name": "Capacete Infantil", "category": "Acessórios", "price": 89.9, "image": "imagens/tela.jpg", "description": "Capacete confortável para proteção durante os passeios."}, {"id": "CESTO01", "name": "Cesto para Bicicleta", "category": "Acessórios", "price": 59.9, "image": "imagens/tela.jpg", "description": "Cesto dianteiro para bicicleta."}];
+const WHATSAPP = "5543999999999"; // TROQUE pelo seu número
+let products = [];
 
 const grid = document.getElementById("grid");
 const search = document.getElementById("search");
 const category = document.getElementById("category");
 const empty = document.getElementById("empty");
 
-[...new Set(products.map(p => p.category))].sort().forEach(c => {
-  const option = document.createElement("option");
-  option.value = c; option.textContent = c;
-  category.appendChild(option);
-});
-
 function money(v) {
-  return v.toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
+  return v.toLocaleString("pt-BR", {
+    style: "currency",
+    currency: "BRL"
+  });
 }
 
 function whatsappUrl(p) {
@@ -63,6 +60,7 @@ function whatsappUrl(p) {
 function render() {
   const q = search.value.toLowerCase().trim();
   const cat = category.value;
+
   const list = products.filter(p =>
     (!q || `${p.name} ${p.description} ${p.id}`.toLowerCase().includes(q)) &&
     (!cat || p.category === cat)
@@ -71,22 +69,52 @@ function render() {
   grid.innerHTML = list.map(p => `
     <article class="card">
       <img src="${p.image}" alt="${p.name}" loading="lazy">
+
       <div class="content">
         <div class="category">${p.category}</div>
         <div class="name">${p.name}</div>
         <div class="desc">${p.description}</div>
         <div class="price">${money(p.price)}</div>
+
         <button onclick='window.open("${whatsappUrl(p)}","_blank")'>
           🟢 Comprar pelo WhatsApp
         </button>
       </div>
     </article>
   `).join("");
+
   empty.hidden = list.length !== 0;
 }
-search.addEventListener("input",render);
-category.addEventListener("change",render);
-render();
+
+search.addEventListener("input", render);
+category.addEventListener("change", render);
+
+fetch("produtos.json")
+  .then(response => {
+    if (!response.ok) {
+      throw new Error("Não foi possível carregar produtos.json");
+    }
+    return response.json();
+  })
+  .then(data => {
+    products = data;
+
+    [...new Set(products.map(p => p.category))]
+      .sort()
+      .forEach(c => {
+        const option = document.createElement("option");
+        option.value = c;
+        option.textContent = c;
+        category.appendChild(option);
+      });
+
+    render();
+  })
+  .catch(error => {
+    console.error(error);
+    empty.hidden = false;
+    empty.textContent = "Erro ao carregar os produtos.";
+  });
 </script>
 </body>
 </html>
