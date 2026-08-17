@@ -1,0 +1,26 @@
+[
+  {
+    "id": "BIKE20",
+    "name": "Bicicleta Aro 20",
+    "category": "Bicicletas",
+    "price": 799.00,
+    "image": "imagens/tela.jpg",
+    "description": "Bicicleta aro 20 para uso urbano e lazer."
+  },
+  {
+    "id": "CAP01",
+    "name": "Capacete Infantil",
+    "category": "Acessórios",
+    "price": 89.90,
+    "image": "imagens/tela.jpg",
+    "description": "Capacete confortável para proteção durante os passeios."
+  },
+  {
+    "id": "CESTO01",
+    "name": "Cesto para Bicicleta",
+    "category": "Acessórios",
+    "price": 59.90,
+    "image": "imagens/tela.jpg",
+    "description": "Cesto dianteiro para bicicleta."
+  }
+]
