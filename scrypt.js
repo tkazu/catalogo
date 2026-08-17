@@ -1,4 +1,4 @@
-```javascript
+
 const WHATSAPP = "5543999999999";
 // Troque pelo seu número.
 // Formato: 55 + DDD + número
@@ -454,4 +454,4 @@ category.addEventListener(
  * Inicia
  */
 init();
-```
+
