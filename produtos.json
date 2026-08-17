@@ -5,7 +5,8 @@
     "category": "Bicicletas",
     "price": 799.00,
     "image": "imagens/tela.jpg",
-    "description": "Bicicleta aro 20 para uso urbano e lazer."
+    "description": "Bicicleta aro 20 para uso urbano e lazer.",
+    "validade": "2026-08-17"
   },
   {
     "id": "CAP0101",
@@ -13,7 +14,8 @@
     "category": "Acessórios",
     "price": 89.90,
     "image": "imagens/tela.jpg",
-    "description": "Capacete confortável para proteção durante os passeios."
+    "description": "Capacete confortável para proteção durante os passeios.",
+    "validade": "2026-08-18"
   },
   {
     "id": "CESTO0101",
