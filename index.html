@@ -1,120 +1,57 @@
+```html
 <!doctype html>
 <html lang="pt-BR">
+
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Meu Catálogo</title>
-<style>
-*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#f5f5f5;color:#222}
-header{background:#128c7e;color:white;padding:24px 16px;text-align:center}
-header h1{margin:0 0 8px;font-size:28px}header p{margin:0}
-.container{max-width:1100px;margin:auto;padding:20px 16px}
-.controls{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px}
-input,select{padding:12px;border:1px solid #ddd;border-radius:8px;background:white;font-size:15px}
-input{flex:1;min-width:220px}.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:18px}
-.card{background:white;border-radius:12px;overflow:hidden;box-shadow:0 2px 10px #00000012}
-.card img{width:100%;height:200px;object-fit:cover;background:#eee}.content{padding:14px}
-.category{font-size:12px;color:#777;text-transform:uppercase}.name{font-size:18px;font-weight:bold;margin:6px 0}
-.desc{font-size:14px;color:#666;min-height:40px}.price{font-size:21px;font-weight:bold;margin:12px 0}
-button{width:100%;padding:12px;border:0;border-radius:8px;background:#25d366;color:white;font-weight:bold;cursor:pointer;font-size:15px}
-button:hover{background:#1ebe5d}.empty{text-align:center;padding:40px;color:#777}
-footer{text-align:center;padding:30px;color:#777;font-size:13px}
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Meu Catálogo</title>
+
+  <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
+
 <header>
   <h1>Meu Catálogo</h1>
   <p>Escolha seu produto e fale conosco pelo WhatsApp</p>
 </header>
+
 <div class="container">
-  <div class="controls">
-    <input id="search" placeholder="🔎 Procurar produto...">
-    <select id="category"><option value="">Todas as categorias</option></select>
+
+  <div id="status" class="status">
+    Carregando catálogo...
   </div>
+
+  <div class="controls">
+
+    <input
+      id="search"
+      type="text"
+      placeholder="🔎 Procurar produto..."
+    >
+
+    <select id="category">
+      <option value="">Todas as categorias</option>
+    </select>
+
+  </div>
+
   <div id="grid" class="grid"></div>
-  <div id="empty" class="empty" hidden>Nenhum produto encontrado.</div>
+
+  <div id="empty" class="empty" hidden>
+    Nenhum produto encontrado.
+  </div>
+
 </div>
-<footer>Atendimento pelo WhatsApp</footer>
 
-<script>
-const WHATSAPP = "5543999999999"; // TROQUE pelo seu número
-let products = [];
+<footer>
+  Atendimento pelo WhatsApp
+</footer>
 
-const grid = document.getElementById("grid");
-const search = document.getElementById("search");
-const category = document.getElementById("category");
-const empty = document.getElementById("empty");
+<script src="script.js"></script>
 
-function money(v) {
-  return v.toLocaleString("pt-BR", {
-    style: "currency",
-    currency: "BRL"
-  });
-}
-
-function whatsappUrl(p) {
-  const text = `Olá! Tenho interesse no produto ${p.id} - ${p.name}, no valor de ${money(p.price)}.`;
-  return `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(text)}`;
-}
-
-function render() {
-  const q = search.value.toLowerCase().trim();
-  const cat = category.value;
-
-  const list = products.filter(p =>
-    (!q || `${p.name} ${p.description} ${p.id}`.toLowerCase().includes(q)) &&
-    (!cat || p.category === cat)
-  );
-
-  grid.innerHTML = list.map(p => `
-    <article class="card">
-      <img src="${p.image}" alt="${p.name}" loading="lazy">
-
-      <div class="content">
-        <div class="category">${p.category}</div>
-        <div class="name">${p.name}</div>
-        <div class="desc">${p.description}</div>
-        <div class="price">${money(p.price)}</div>
-
-        <button onclick='window.open("${whatsappUrl(p)}","_blank")'>
-          🟢 Comprar pelo WhatsApp
-        </button>
-      </div>
-    </article>
-  `).join("");
-
-  empty.hidden = list.length !== 0;
-}
-
-search.addEventListener("input", render);
-category.addEventListener("change", render);
-
-fetch("produtos.json")
-  .then(response => {
-    if (!response.ok) {
-      throw new Error("Não foi possível carregar produtos.json");
-    }
-    return response.json();
-  })
-  .then(data => {
-    products = data;
-
-    [...new Set(products.map(p => p.category))]
-      .sort()
-      .forEach(c => {
-        const option = document.createElement("option");
-        option.value = c;
-        option.textContent = c;
-        category.appendChild(option);
-      });
-
-    render();
-  })
-  .catch(error => {
-    console.error(error);
-    empty.hidden = false;
-    empty.textContent = "Erro ao carregar os produtos.";
-  });
-</script>
 </body>
 </html>
+```
