@@ -59,7 +59,7 @@ jobs:
             const produtos = result.rows.map(p => ({
               id: p.id,
               name: p.nome,
-              category: "",
+              category: p.categoria,
               description: p.descricao || "",
               price: Number(p.preco),
               validade: p.validade
