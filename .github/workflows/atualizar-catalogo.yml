@@ -43,14 +43,15 @@ jobs:
             await client.connect();
 
             const result = await client.query(`
-              SELECT
-                id,
-                nome,
-                descricao,
-                preco,
-                validade,
-                imagem
-              FROM produtos
+             SELECT
+              id,
+              nome,
+              categoria,
+              descricao,
+              preco,
+              validade,
+              imagem
+            FROM produtos
               WHERE ativo = true
               ORDER BY id
             `);
