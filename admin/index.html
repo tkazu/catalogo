@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Administração - Catálogo</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 420px;
+      margin: 60px auto;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    input {
+      padding: 12px;
+      font-size: 16px;
+    }
+
+    button {
+      padding: 12px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    #mensagem {
+      margin-top: 20px;
+      text-align: center;
+    }
+  </style>
+</head>
+
+<body>
+
+  <h1>Administração</h1>
+
+  <form id="loginForm">
+
+    <input
+      type="email"
+      id="email"
+      placeholder="E-mail"
+      required
+    >
+
+    <input
+      type="password"
+      id="password"
+      placeholder="Senha"
+      required
+    >
+
+    <button type="submit">
+      Entrar
+    </button>
+
+  </form>
+
+  <div id="mensagem"></div>
+
+  <script type="module">
+
+    import { createAuthClient } from "https://esm.sh/better-auth/client";
+
+    const auth = createAuthClient({
+      baseURL: "COLOQUE_AQUI_SEU_AUTH_URL"
+    });
+
+    const form = document.getElementById("loginForm");
+    const mensagem = document.getElementById("mensagem");
+
+    form.addEventListener("submit", async (event) => {
+
+      event.preventDefault();
+
+      mensagem.textContent = "Entrando...";
+
+      const email =
+        document.getElementById("email").value;
+
+      const password =
+        document.getElementById("password").value;
+
+      try {
+
+        const result =
+          await auth.signIn.email({
+            email,
+            password
+          });
+
+        if (result.error) {
+          throw new Error(
+            result.error.message || "Erro ao entrar"
+          );
+        }
+
+        mensagem.textContent =
+          "Login realizado com sucesso!";
+
+        console.log(result);
+
+      } catch (error) {
+
+        console.error(error);
+
+        mensagem.textContent =
+          "E-mail ou senha inválidos.";
+      }
+
+    });
+
+  </script>
+
+</body>
+</html>
