@@ -7,5 +7,14 @@
     "price": 40,
     "validade": "2026-09-01",
     "image": "imagens/tela.jpg"
+  },
+  {
+    "id": "2",
+    "name": "pote",
+    "category": "potes",
+    "description": "pote quadrado 1L",
+    "price": 100,
+    "validade": "2026-10-01",
+    "image": "imagens/tela.jpg"
   }
 ]
